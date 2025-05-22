@@ -1,6 +1,5 @@
 package com.example.springboot.assento.model;
 
-import com.example.springboot.filme.model.FilmeModel;
 import com.example.springboot.pessoa.model.PessoaModel;
 import com.example.springboot.sessao.model.SessaoModel;
 import jakarta.persistence.*;

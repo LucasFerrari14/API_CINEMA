@@ -51,7 +51,7 @@ public class PessoaController {
         return ResponseEntity.status(HttpStatus.OK).body(pessoaRepositorio.save(pessoaModel));
     }
 
-    @DeleteMapping("/products/{cdPessoa}")
+    @DeleteMapping("/pessoas/{cdPessoa}")
     public ResponseEntity<Object> deletePessoa(@PathVariable(value="cdPessoa") UUID cdPessoa) {
         Optional<PessoaModel> pessoa0 = pessoaRepositorio.findById(cdPessoa);
         if(pessoa0.isEmpty()) {

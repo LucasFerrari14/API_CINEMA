@@ -1,5 +1,6 @@
 package com.example.springboot.filme.controller;
 
+import com.example.springboot.filme.DTO.FilmeDTO;
 import com.example.springboot.filme.model.FilmeModel;
 import com.example.springboot.filme.repositorio.FilmeRepositorio;
 
@@ -19,44 +20,46 @@ public class FilmeController {
     @Autowired
     FilmeRepositorio filmeRepositorio;
 
-    @PostMapping("/pessoas")
-    public ResponseEntity<FilmeModel> savePessoa(@RequestBody @Valid PessoaDTO pessoaDTO) {
-        FilmeModel pessoaModel = new FilmeModel();
-        BeanUtils.copyProperties(pessoaDTO, pessoaModel);
-        return ResponseEntity.status(HttpStatus.CREATED).body(pessoaRepositorio.save(pessoaModel));
-    }
-    @GetMapping("/pessoas")
-    public ResponseEntity<List<FilmeModel>> getAllPessoas() {
-        return ResponseEntity.status(HttpStatus.OK).body(pessoaRepositorio.findAll());
-    }
-    @GetMapping("/pessoas/{cdPessoa}")
-    public ResponseEntity<Object> getOnePessoa(@PathVariable(value="cdPessoa") UUID id) {
-        Optional<FilmeModel> pessoa0 = pessoaRepositorio.findById(id);
-        if(pessoa0.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pessoa não encontrada");
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(pessoa0.get());
-    }
-    @PutMapping("/pessoas/{cdPessoa}")
-    public ResponseEntity<Object> updatePessoa(@PathVariable(value="cdPessoa") UUID cdPessoa,
-                                               @RequestBody @Valid PessoaDTO pessoaDTO) {
-        Optional<FilmeModel\> pessoa0 = pessoaRepositorio.findById(cdPessoa);
-        if(pessoa0.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pessoa não encontrada");
-        }
-        var pessoaModel = pessoa0.get();
-        BeanUtils.copyProperties(pessoaDTO, pessoaModel);
-        return ResponseEntity.status(HttpStatus.OK).body(pessoaRepositorio.save(pessoaModel));
+    @PostMapping("/filmes")
+    public ResponseEntity<FilmeModel> savefilme(@RequestBody @Valid FilmeDTO filmeDTO) {
+        FilmeModel filmeModel = new FilmeModel();
+        BeanUtils.copyProperties(filmeDTO, filmeModel);
+        return ResponseEntity.status(HttpStatus.CREATED).body(filmeRepositorio.save(filmeModel));
     }
 
-    @DeleteMapping("/products/{cdPessoa}")
-    public ResponseEntity<Object> deletePessoa(@PathVariable(value="cdPessoa") UUID cdPessoa) {
-        Optional<PessoaModel> pessoa0 = pessoaRepositorio.findById(cdPessoa);
-        if(pessoa0.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pessoa não encontrada");
-        }
-        pessoaRepositorio.delete(pessoa0.get());
-        return ResponseEntity.status(HttpStatus.OK).body("Pessoa deletada com sucesso");
+    @GetMapping("/filmes")
+    public ResponseEntity<List<FilmeModel>> getAllFilmes() {
+        return ResponseEntity.status(HttpStatus.OK).body(filmeRepositorio.findAll());
     }
 
+    @GetMapping("/filmes/{cdFilme}")
+    public ResponseEntity<Object> getOneFilme(@PathVariable(value="cdFilme") UUID id) {
+        Optional<FilmeModel> filme0 = filmeRepositorio.findById(id);
+        if(filme0.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Filme não encontrado");
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(filme0.get());
+    }
+
+    @PutMapping("/filmes/{cdFilme}")
+    public ResponseEntity<Object> updatefilme(@PathVariable(value="cdFilme") UUID cdFilme,
+                                               @RequestBody @Valid FilmeDTO filmeDTO) {
+        Optional<FilmeModel> filme0 = filmeRepositorio.findById(cdFilme);
+        if(filme0.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Filme não encontrado");
+        }
+        var filmeModel = filme0.get();
+        BeanUtils.copyProperties(filmeDTO, filmeModel);
+        return ResponseEntity.status(HttpStatus.OK).body(filmeRepositorio.save(filmeModel));
+    }
+
+    @DeleteMapping("/filmes/{cdFilme}")
+    public ResponseEntity<Object> deletefilme(@PathVariable(value="cdFilme") UUID cdFilme) {
+        Optional<FilmeModel> filme0 = filmeRepositorio.findById(cdFilme);
+        if(filme0.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Filme não encontrado");
+        }
+        filmeRepositorio.delete(filme0.get());
+        return ResponseEntity.status(HttpStatus.OK).body("Filme deletado com sucesso");
+    }
 }

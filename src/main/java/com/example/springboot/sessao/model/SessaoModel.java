@@ -6,8 +6,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.sql.Time;
-import java.util.Date;
+import java.time.LocalTime;
 import java.util.UUID;
 
 @Entity
@@ -24,10 +23,10 @@ public class SessaoModel implements Serializable  {
     private Integer nuSessao;
 
     @Column(name = "HR_INICIO")
-    private Time hrInicio;
+    private LocalTime hrInicio;
 
     @Column(name = "HR_FIM")
-    private Time hrFim;
+    private LocalTime hrFim;
 
     @ManyToOne()
     @JoinColumn(name = "CD_FILME")
