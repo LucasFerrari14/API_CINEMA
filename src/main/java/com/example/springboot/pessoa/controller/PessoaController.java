@@ -1,9 +1,9 @@
 package com.example.springboot.pessoa.controller;
 
 
+import com.example.springboot.pessoa.service.PessoaService;
 import com.example.springboot.pessoa.DTO.PessoaDTO;
 import com.example.springboot.pessoa.model.PessoaModel;
-import com.example.springboot.pessoa.repositorio.PessoaRepositorio;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,47 +17,47 @@ import java.util.UUID;
 
 @RestController
 public class PessoaController {
-
     @Autowired
-    PessoaRepositorio pessoaRepositorio;
+    private PessoaService pessoaService;
 
     @PostMapping("/pessoas")
     public ResponseEntity<PessoaModel> savePessoa(@RequestBody @Valid PessoaDTO pessoaDTO) {
-        PessoaModel pessoaModel = new PessoaModel();
-        BeanUtils.copyProperties(pessoaDTO, pessoaModel);
-        return ResponseEntity.status(HttpStatus.CREATED).body(pessoaRepositorio.save(pessoaModel));
+        return ResponseEntity.status(HttpStatus.CREATED).body(pessoaService.save(pessoaDTO));
     }
+
     @GetMapping("/pessoas")
     public ResponseEntity<List<PessoaModel>> getAllPessoas() {
-        return ResponseEntity.status(HttpStatus.OK).body(pessoaRepositorio.findAll());
+        return ResponseEntity.status(HttpStatus.OK).body(pessoaService.listAll());
     }
+
     @GetMapping("/pessoas/{cdPessoa}")
     public ResponseEntity<Object> getOnePessoa(@PathVariable(value="cdPessoa") UUID id) {
-        Optional<PessoaModel> pessoa0 = pessoaRepositorio.findById(id);
-        if(pessoa0.isEmpty()) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pessoa não encontrada");
+        Optional<PessoaModel> pessoa = pessoaService.findById(id);
+        if (pessoa.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pessoa não encontrada");
         }
-        return ResponseEntity.status(HttpStatus.OK).body(pessoa0.get());
+        return ResponseEntity.status(HttpStatus.OK).body(pessoa.get());
     }
+
     @PutMapping("/pessoas/{cdPessoa}")
     public ResponseEntity<Object> updatePessoa(@PathVariable(value="cdPessoa") UUID cdPessoa,
                                                @RequestBody @Valid PessoaDTO pessoaDTO) {
-        Optional<PessoaModel> pessoa0 = pessoaRepositorio.findById(cdPessoa);
-        if(pessoa0.isEmpty()) {
+        Optional<PessoaModel> pessoa = pessoaService.findById(cdPessoa);
+        if(pessoa.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pessoa não encontrada");
         }
-        var pessoaModel = pessoa0.get();
+        var pessoaModel = pessoa.get();
         BeanUtils.copyProperties(pessoaDTO, pessoaModel);
-        return ResponseEntity.status(HttpStatus.OK).body(pessoaRepositorio.save(pessoaModel));
+        return ResponseEntity.status(HttpStatus.OK).body(pessoaService.update(pessoaModel));
     }
 
     @DeleteMapping("/pessoas/{cdPessoa}")
     public ResponseEntity<Object> deletePessoa(@PathVariable(value="cdPessoa") UUID cdPessoa) {
-        Optional<PessoaModel> pessoa0 = pessoaRepositorio.findById(cdPessoa);
-        if(pessoa0.isEmpty()) {
+        Optional<PessoaModel> pessoa = pessoaService.findById(cdPessoa);
+        if(pessoa.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pessoa não encontrada");
         }
-        pessoaRepositorio.delete(pessoa0.get());
+        pessoaService.delete(pessoa.get());
         return ResponseEntity.status(HttpStatus.OK).body("Pessoa deletada com sucesso");
     }
 }

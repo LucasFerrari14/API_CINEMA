@@ -1,9 +1,9 @@
 package com.example.springboot.filme.controller;
 
+
 import com.example.springboot.filme.DTO.FilmeDTO;
 import com.example.springboot.filme.model.FilmeModel;
-import com.example.springboot.filme.repositorio.FilmeRepositorio;
-
+import com.example.springboot.filme.service.FilmeService;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,48 +18,46 @@ import java.util.UUID;
 @RestController
 public class FilmeController {
     @Autowired
-    FilmeRepositorio filmeRepositorio;
+    FilmeService filmeService;
 
     @PostMapping("/filmes")
-    public ResponseEntity<FilmeModel> savefilme(@RequestBody @Valid FilmeDTO filmeDTO) {
-        FilmeModel filmeModel = new FilmeModel();
-        BeanUtils.copyProperties(filmeDTO, filmeModel);
-        return ResponseEntity.status(HttpStatus.CREATED).body(filmeRepositorio.save(filmeModel));
+    public ResponseEntity<FilmeModel> saveFilme(@RequestBody @Valid FilmeDTO filmeDTO) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(filmeService.save(filmeDTO));
     }
 
     @GetMapping("/filmes")
     public ResponseEntity<List<FilmeModel>> getAllFilmes() {
-        return ResponseEntity.status(HttpStatus.OK).body(filmeRepositorio.findAll());
+        return ResponseEntity.status(HttpStatus.OK).body(filmeService.listAll());
     }
 
-    @GetMapping("/filmes/{cdFilme}")
-    public ResponseEntity<Object> getOneFilme(@PathVariable(value="cdFilme") UUID id) {
-        Optional<FilmeModel> filme0 = filmeRepositorio.findById(id);
-        if(filme0.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Filme não encontrado");
+    @GetMapping("/filmes/{cdfilme}")
+    public ResponseEntity<Object> getOneFilme(@PathVariable(value="cdfilme") UUID id) {
+        Optional<FilmeModel> filme = filmeService.findById(id);
+        if (filme.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("filme não encontrada");
         }
-        return ResponseEntity.status(HttpStatus.OK).body(filme0.get());
+        return ResponseEntity.status(HttpStatus.OK).body(filme.get());
     }
 
-    @PutMapping("/filmes/{cdFilme}")
-    public ResponseEntity<Object> updatefilme(@PathVariable(value="cdFilme") UUID cdFilme,
+    @PutMapping("/filmes/{cdfilme}")
+    public ResponseEntity<Object> updateFilme(@PathVariable(value="cdfilme") UUID cdfilme,
                                                @RequestBody @Valid FilmeDTO filmeDTO) {
-        Optional<FilmeModel> filme0 = filmeRepositorio.findById(cdFilme);
-        if(filme0.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Filme não encontrado");
+        Optional<FilmeModel> filme = filmeService.findById(cdfilme);
+        if(filme.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("filme não encontrada");
         }
-        var filmeModel = filme0.get();
+        var filmeModel = filme.get();
         BeanUtils.copyProperties(filmeDTO, filmeModel);
-        return ResponseEntity.status(HttpStatus.OK).body(filmeRepositorio.save(filmeModel));
+        return ResponseEntity.status(HttpStatus.OK).body(filmeService.update(filmeModel));
     }
 
-    @DeleteMapping("/filmes/{cdFilme}")
-    public ResponseEntity<Object> deletefilme(@PathVariable(value="cdFilme") UUID cdFilme) {
-        Optional<FilmeModel> filme0 = filmeRepositorio.findById(cdFilme);
-        if(filme0.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Filme não encontrado");
+    @DeleteMapping("/filmes/{cdfilme}")
+    public ResponseEntity<Object> deleteFilme(@PathVariable(value="cdfilme") UUID cdfilme) {
+        Optional<FilmeModel> filme = filmeService.findById(cdfilme);
+        if(filme.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("filme não encontrada");
         }
-        filmeRepositorio.delete(filme0.get());
-        return ResponseEntity.status(HttpStatus.OK).body("Filme deletado com sucesso");
+        filmeService.delete(filme.get());
+        return ResponseEntity.status(HttpStatus.OK).body("filme deletada com sucesso");
     }
 }

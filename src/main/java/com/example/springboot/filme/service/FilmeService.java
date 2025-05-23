@@ -1,0 +1,44 @@
+package com.example.springboot.filme.service;
+
+
+import com.example.springboot.filme.DTO.FilmeDTO;
+import com.example.springboot.filme.model.FilmeModel;
+import com.example.springboot.filme.repositorio.FilmeRepositorio;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+
+@Service
+public class FilmeService {
+    @Autowired
+    private FilmeRepositorio filmeRepositorio;
+
+    public Optional<FilmeModel> findById(UUID id) {
+        return filmeRepositorio.findById(id);
+    }
+    public List<FilmeModel> listAll() {
+        return filmeRepositorio.findAll();
+    }
+
+    public FilmeModel save(@RequestBody @Valid FilmeDTO filmeDTO) {
+        FilmeModel filme = new FilmeModel();
+        BeanUtils.copyProperties(filmeDTO, filme);
+        filmeRepositorio.save(filme);
+        return filme;
+    }
+
+    public FilmeModel update(@NotNull FilmeModel filme) {
+        return filmeRepositorio.save(filme);
+    }
+
+    public void delete(@NotNull FilmeModel filme) {
+        filmeRepositorio.delete(filme);
+    }
+}
