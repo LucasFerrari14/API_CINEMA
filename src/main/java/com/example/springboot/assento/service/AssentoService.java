@@ -41,4 +41,8 @@ public class AssentoService {
     public void delete(@NotNull AssentoModel assento) {
         assentoRepository.delete(assento);
     }
+
+    public List<AssentoModel> searchSeatsMovie(@NotNull UUID cdFilme) {
+        return assentoRepository.searchSeatsMovie(cdFilme);
+    }
 }

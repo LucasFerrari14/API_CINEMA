@@ -1,6 +1,7 @@
 package com.example.springboot.filme.service;
 
 
+import com.example.springboot.assento.model.AssentoModel;
 import com.example.springboot.filme.DTO.FilmeDTO;
 import com.example.springboot.filme.model.FilmeModel;
 import com.example.springboot.filme.repositorio.FilmeRepositorio;
@@ -20,16 +21,16 @@ public class FilmeService {
     @Autowired
     private FilmeRepositorio filmeRepositorio;
 
-    public Optional<FilmeModel> findById(UUID id) {
-        return filmeRepositorio.findById(id);
+    public FilmeModel findById(UUID id) {
+        if (!this.filmeRepositorio.existsById(id)) throw new RuntimeException("filme não existente!");
+        Optional<FilmeModel> filme = filmeRepositorio.findById(id);
+        return filme.get();
     }
     public List<FilmeModel> listAll() {
         return filmeRepositorio.findAll();
     }
 
-    public FilmeModel save(@RequestBody @Valid FilmeDTO filmeDTO) {
-        FilmeModel filme = new FilmeModel();
-        BeanUtils.copyProperties(filmeDTO, filme);
+    public FilmeModel save(@RequestBody @Valid FilmeModel filme) {
         filmeRepositorio.save(filme);
         return filme;
     }
@@ -39,6 +40,8 @@ public class FilmeService {
     }
 
     public void delete(@NotNull FilmeModel filme) {
-        filmeRepositorio.delete(filme);
+        if (!this.filmeRepositorio.existsById(filme.getCdFilme())) throw new RuntimeException("filme não existente!");
+        this.filmeRepositorio.delete(filme);
     }
+
 }

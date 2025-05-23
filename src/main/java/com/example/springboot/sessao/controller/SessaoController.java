@@ -16,21 +16,22 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@RestController
 public class SessaoController {
     @Autowired
     SessaoService sessaoService;
 
-    @PostMapping("/sessaos")
+    @PostMapping("/sessoes")
     public ResponseEntity<SessaoModel> saveSessao(@RequestBody @Valid SessaoDTO sessaoDTO) {
         return ResponseEntity.status(HttpStatus.CREATED).body(sessaoService.save(sessaoDTO));
     }
 
-    @GetMapping("/sessaos")
+    @GetMapping("/sessoes")
     public ResponseEntity<List<SessaoModel>> getAllSessaos() {
         return ResponseEntity.status(HttpStatus.OK).body(sessaoService.listAll());
     }
 
-    @GetMapping("/sessaos/{cdsessao}")
+    @GetMapping("/sessoes/{cdsessao}")
     public ResponseEntity<Object> getOneSessao(@PathVariable(value="cdsessao") UUID id) {
         Optional<SessaoModel> sessao = sessaoService.findById(id);
         if (sessao.isEmpty()) {
@@ -39,7 +40,7 @@ public class SessaoController {
         return ResponseEntity.status(HttpStatus.OK).body(sessao.get());
     }
 
-    @PutMapping("/sessaos/{cdsessao}")
+    @PutMapping("/sessoes/{cdsessao}")
     public ResponseEntity<Object> updateSessao(@PathVariable(value="cdsessao") UUID cdsessao,
                                                @RequestBody @Valid SessaoDTO sessaoDTO) {
         Optional<SessaoModel> sessao = sessaoService.findById(cdsessao);
@@ -51,7 +52,7 @@ public class SessaoController {
         return ResponseEntity.status(HttpStatus.OK).body(sessaoService.update(sessaoModel));
     }
 
-    @DeleteMapping("/sessaos/{cdsessao}")
+    @DeleteMapping("/sessoes/{cdsessao}")
     public ResponseEntity<Object> deleteSessao(@PathVariable(value="cdsessao") UUID cdsessao) {
         Optional<SessaoModel> sessao = sessaoService.findById(cdsessao);
         if(sessao.isEmpty()) {

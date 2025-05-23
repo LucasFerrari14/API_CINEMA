@@ -1,6 +1,7 @@
 package com.example.springboot.filme.controller;
 
 
+import com.example.springboot.assento.service.AssentoService;
 import com.example.springboot.filme.DTO.FilmeDTO;
 import com.example.springboot.filme.model.FilmeModel;
 import com.example.springboot.filme.service.FilmeService;
@@ -11,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -20,9 +22,17 @@ public class FilmeController {
     @Autowired
     FilmeService filmeService;
 
+    @Autowired
+    AssentoService assentoService;
+
     @PostMapping("/filmes")
-    public ResponseEntity<FilmeModel> saveFilme(@RequestBody @Valid FilmeDTO filmeDTO) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(filmeService.save(filmeDTO));
+    public ResponseEntity<Object> saveFilme(@RequestBody @Valid FilmeDTO filmeDTO) {
+        FilmeModel filme = new FilmeModel();
+        BeanUtils.copyProperties(filmeDTO, filme);
+        if (!(validateDate(filme.getDtInicioCartaz(),filme.getDtFimCartaz()))) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body("A data final está marcada para antes da Data Inicial");
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(filmeService.save(filme));
     }
 
     @GetMapping("/filmes")
@@ -32,32 +42,39 @@ public class FilmeController {
 
     @GetMapping("/filmes/{cdfilme}")
     public ResponseEntity<Object> getOneFilme(@PathVariable(value="cdfilme") UUID id) {
-        Optional<FilmeModel> filme = filmeService.findById(id);
-        if (filme.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("filme não encontrada");
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(filme.get());
+        FilmeModel filme = filmeService.findById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(filme);
     }
 
     @PutMapping("/filmes/{cdfilme}")
     public ResponseEntity<Object> updateFilme(@PathVariable(value="cdfilme") UUID cdfilme,
                                                @RequestBody @Valid FilmeDTO filmeDTO) {
-        Optional<FilmeModel> filme = filmeService.findById(cdfilme);
-        if(filme.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("filme não encontrada");
-        }
-        var filmeModel = filme.get();
-        BeanUtils.copyProperties(filmeDTO, filmeModel);
-        return ResponseEntity.status(HttpStatus.OK).body(filmeService.update(filmeModel));
+        FilmeModel filme = filmeService.findById(cdfilme);
+        return ResponseEntity.status(HttpStatus.OK).body(filmeService.update(filme));
     }
 
     @DeleteMapping("/filmes/{cdfilme}")
     public ResponseEntity<Object> deleteFilme(@PathVariable(value="cdfilme") UUID cdfilme) {
-        Optional<FilmeModel> filme = filmeService.findById(cdfilme);
-        if(filme.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("filme não encontrada");
+        FilmeModel filme = filmeService.findById(cdfilme);
+        if (!((haveValidTickets(filme.getCdFilme())))) {
+            return ResponseEntity.status(HttpStatus.NON_AUTHORITATIVE_INFORMATION).body("Filme selecionado tem sessões com assentos vendidos!");
         }
-        filmeService.delete(filme.get());
+        filmeService.delete(filme);
         return ResponseEntity.status(HttpStatus.OK).body("filme deletada com sucesso");
+    }
+
+    public Boolean validateDate(Date dtInicio, Date dtFinal) {
+        if(dtInicio.before(dtFinal)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public Boolean haveValidTickets(UUID cdFilme) {
+        if (assentoService.searchSeatsMovie(cdFilme).isEmpty()) {
+            return false;
+        }
+        return true;
     }
 }
