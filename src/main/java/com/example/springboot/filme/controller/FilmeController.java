@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -66,6 +67,17 @@ public class FilmeController {
         sessaoService.deleteSessionByFilm(filme.getCdFilme());
         filmeService.delete(filme);
         return ResponseEntity.status(HttpStatus.OK).body("filme deletada com sucesso");
+    }
+
+    @GetMapping("/filmes/today")
+    public ResponseEntity<Object> showAvaliableMoviesToday() {
+        LocalDate dtHoje = LocalDate.now();
+        List<FilmeModel> filmes = filmeService.listFilmsToday(dtHoje);
+        if (filmes.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.OK).body("Nenhum filme está em cartaz hoje");
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(filmes);
+
     }
 
     public Boolean validateDate(Date dtInicio, Date dtFinal) {
