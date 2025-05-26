@@ -13,6 +13,7 @@ import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -23,32 +24,36 @@ public class FilmeService {
 
 
     @Autowired
-    FilmeRepositorio filmeRepositorio;
+    FilmeRepositorio filmeRepository;
 
     public FilmeService(FilmeRepositorio filmeRepositorio) {
-        this.filmeRepositorio = filmeRepositorio;
+        this.filmeRepository = filmeRepositorio;
     }
 
     public FilmeModel findById(UUID id) {
-        return filmeRepositorio.findById(id).orElseThrow(() -> new RuntimeException("Filme não encontrado"));
+        return filmeRepository.findById(id).orElseThrow(() -> new RuntimeException("Filme não encontrado"));
     }
 
     public List<FilmeModel> listAll() {
-        return filmeRepositorio.findAll();
+        return filmeRepository.findAll();
     }
 
     public FilmeModel save(@RequestBody @Valid FilmeModel filme) {
-        filmeRepositorio.save(filme);
+        filmeRepository.save(filme);
         return filme;
     }
 
     public FilmeModel update(@NotNull FilmeModel filme) {
-        return filmeRepositorio.save(filme);
+        return filmeRepository.save(filme);
     }
 
     public void delete(@NotNull FilmeModel filme) {
-        if (!this.filmeRepositorio.existsById(filme.getCdFilme())) throw new RuntimeException("filme não existente!");
-        this.filmeRepositorio.delete(filme);
+        if (!this.filmeRepository.existsById(filme.getCdFilme())) throw new RuntimeException("filme não existente!");
+        this.filmeRepository.delete(filme);
+    }
+
+    public List<FilmeModel> listFilmsToday(LocalDate data) {
+        return filmeRepository.findFilmByDay(data);
     }
 
 }
