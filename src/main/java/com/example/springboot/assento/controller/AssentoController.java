@@ -32,32 +32,22 @@ public class AssentoController {
 
     @GetMapping("/assentos/{cdassento}")
     public ResponseEntity<Object> getOneassento(@PathVariable(value="cdassento") UUID id) {
-        Optional<AssentoModel> assento = assentoService.findById(id);
-        if (assento.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("assento não encontrada");
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(assento.get());
+        AssentoModel assento = assentoService.findById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(assento);
     }
 
     @PutMapping("/assentos/{cdassento}")
     public ResponseEntity<Object> updateassento(@PathVariable(value="cdassento") UUID cdassento,
                                                @RequestBody @Valid AssentoDTO assentoDTO) {
-        Optional<AssentoModel> assento = assentoService.findById(cdassento);
-        if(assento.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("assento não encontrada");
-        }
-        var assentoModel = assento.get();
-        BeanUtils.copyProperties(assentoDTO, assentoModel);
-        return ResponseEntity.status(HttpStatus.OK).body(assentoService.update(assentoModel));
+        AssentoModel assento = assentoService.findById(cdassento);
+        BeanUtils.copyProperties(assentoDTO, assento);
+        return ResponseEntity.status(HttpStatus.OK).body(assentoService.update(assento));
     }
 
     @DeleteMapping("/assentos/{cdassento}")
     public ResponseEntity<Object> deleteassento(@PathVariable(value="cdassento") UUID cdassento) {
-        Optional<AssentoModel> assento = assentoService.findById(cdassento);
-        if(assento.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("assento não encontrada");
-        }
-        assentoService.delete(assento.get());
-        return ResponseEntity.status(HttpStatus.OK).body("assento deletada com sucesso");
+        AssentoModel assento = assentoService.findById(cdassento);
+        assentoService.delete(assento);
+        return ResponseEntity.status(HttpStatus.OK).body("assento deletado com sucesso");
     }
 }

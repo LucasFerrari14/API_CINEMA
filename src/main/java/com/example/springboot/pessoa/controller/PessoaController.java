@@ -32,32 +32,22 @@ public class PessoaController {
 
     @GetMapping("/pessoas/{cdPessoa}")
     public ResponseEntity<Object> getOnePessoa(@PathVariable(value="cdPessoa") UUID id) {
-        Optional<PessoaModel> pessoa = pessoaService.findById(id);
-        if (pessoa.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pessoa não encontrada");
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(pessoa.get());
+        PessoaModel pessoa = pessoaService.findById(id);
+        return ResponseEntity.status(HttpStatus.OK).body(pessoa);
     }
 
     @PutMapping("/pessoas/{cdPessoa}")
     public ResponseEntity<Object> updatePessoa(@PathVariable(value="cdPessoa") UUID cdPessoa,
                                                @RequestBody @Valid PessoaDTO pessoaDTO) {
-        Optional<PessoaModel> pessoa = pessoaService.findById(cdPessoa);
-        if(pessoa.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pessoa não encontrada");
-        }
-        var pessoaModel = pessoa.get();
-        BeanUtils.copyProperties(pessoaDTO, pessoaModel);
-        return ResponseEntity.status(HttpStatus.OK).body(pessoaService.update(pessoaModel));
+        PessoaModel pessoa = pessoaService.findById(cdPessoa);
+        BeanUtils.copyProperties(pessoaDTO, pessoa);
+        return ResponseEntity.status(HttpStatus.OK).body(pessoaService.update(pessoa));
     }
 
     @DeleteMapping("/pessoas/{cdPessoa}")
     public ResponseEntity<Object> deletePessoa(@PathVariable(value="cdPessoa") UUID cdPessoa) {
-        Optional<PessoaModel> pessoa = pessoaService.findById(cdPessoa);
-        if(pessoa.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Pessoa não encontrada");
-        }
-        pessoaService.delete(pessoa.get());
+        PessoaModel pessoa = pessoaService.findById(cdPessoa);
+        pessoaService.delete(pessoa);
         return ResponseEntity.status(HttpStatus.OK).body("Pessoa deletada com sucesso");
     }
 }

@@ -9,23 +9,30 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class FilmeService {
+
+
     @Autowired
-    private FilmeRepositorio filmeRepositorio;
+    FilmeRepositorio filmeRepositorio;
+
+    public FilmeService(FilmeRepositorio filmeRepositorio) {
+        this.filmeRepositorio = filmeRepositorio;
+    }
 
     public FilmeModel findById(UUID id) {
-        if (!this.filmeRepositorio.existsById(id)) throw new RuntimeException("filme não existente!");
-        Optional<FilmeModel> filme = filmeRepositorio.findById(id);
-        return filme.get();
+        return filmeRepositorio.findById(id).orElseThrow(() -> new RuntimeException("Filme não encontrado"));
     }
+
     public List<FilmeModel> listAll() {
         return filmeRepositorio.findAll();
     }

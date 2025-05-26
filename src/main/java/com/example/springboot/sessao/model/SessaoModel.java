@@ -31,5 +31,8 @@ public class SessaoModel implements Serializable  {
     @ManyToOne()
     @JoinColumn(name = "CD_FILME")
     private FilmeModel cdFilme;
+
+    @Column(name = "FL_ATIVO")
+    private Boolean flAtivo;
 }
 

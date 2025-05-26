@@ -33,32 +33,24 @@ public class SessaoController {
 
     @GetMapping("/sessoes/{cdsessao}")
     public ResponseEntity<Object> getOneSessao(@PathVariable(value="cdsessao") UUID id) {
-        Optional<SessaoModel> sessao = sessaoService.findById(id);
-        if (sessao.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("sessao não encontrada");
-        }
-        return ResponseEntity.status(HttpStatus.OK).body(sessao.get());
+        SessaoModel sessao = sessaoService.findById(id);
+
+        return ResponseEntity.status(HttpStatus.OK).body(sessao);
     }
 
     @PutMapping("/sessoes/{cdsessao}")
     public ResponseEntity<Object> updateSessao(@PathVariable(value="cdsessao") UUID cdsessao,
                                                @RequestBody @Valid SessaoDTO sessaoDTO) {
-        Optional<SessaoModel> sessao = sessaoService.findById(cdsessao);
-        if(sessao.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("sessao não encontrada");
-        }
-        var sessaoModel = sessao.get();
-        BeanUtils.copyProperties(sessaoDTO, sessaoModel);
-        return ResponseEntity.status(HttpStatus.OK).body(sessaoService.update(sessaoModel));
+        SessaoModel sessao = sessaoService.findById(cdsessao);
+        BeanUtils.copyProperties(sessaoDTO, sessao);
+        return ResponseEntity.status(HttpStatus.OK).body(sessaoService.update(sessao));
     }
 
     @DeleteMapping("/sessoes/{cdsessao}")
     public ResponseEntity<Object> deleteSessao(@PathVariable(value="cdsessao") UUID cdsessao) {
-        Optional<SessaoModel> sessao = sessaoService.findById(cdsessao);
-        if(sessao.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("sessao não encontrada");
-        }
-        sessaoService.delete(sessao.get());
+        SessaoModel sessao = sessaoService.findById(cdsessao);
+
+        sessaoService.delete(sessao);
         return ResponseEntity.status(HttpStatus.OK).body("sessao deletada com sucesso");
     }
 }

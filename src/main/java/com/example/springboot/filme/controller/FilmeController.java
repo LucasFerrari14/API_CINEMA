@@ -5,6 +5,7 @@ import com.example.springboot.assento.service.AssentoService;
 import com.example.springboot.filme.DTO.FilmeDTO;
 import com.example.springboot.filme.model.FilmeModel;
 import com.example.springboot.filme.service.FilmeService;
+import com.example.springboot.sessao.service.SessaoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,9 @@ public class FilmeController {
 
     @Autowired
     AssentoService assentoService;
+
+    @Autowired
+    SessaoService sessaoService;
 
     @PostMapping("/filmes")
     public ResponseEntity<Object> saveFilme(@RequestBody @Valid FilmeDTO filmeDTO) {
@@ -56,25 +60,19 @@ public class FilmeController {
     @DeleteMapping("/filmes/{cdfilme}")
     public ResponseEntity<Object> deleteFilme(@PathVariable(value="cdfilme") UUID cdfilme) {
         FilmeModel filme = filmeService.findById(cdfilme);
-        if (!((haveValidTickets(filme.getCdFilme())))) {
+        if (haveValidTickets(filme.getCdFilme())) {
             return ResponseEntity.status(HttpStatus.NON_AUTHORITATIVE_INFORMATION).body("Filme selecionado tem sessões com assentos vendidos!");
         }
+        sessaoService.deleteSessionByFilm(filme.getCdFilme());
         filmeService.delete(filme);
         return ResponseEntity.status(HttpStatus.OK).body("filme deletada com sucesso");
     }
 
     public Boolean validateDate(Date dtInicio, Date dtFinal) {
-        if(dtInicio.before(dtFinal)) {
-            return true;
-        } else {
-            return false;
-        }
+        return dtInicio.before(dtFinal);
     }
 
     public Boolean haveValidTickets(UUID cdFilme) {
-        if (assentoService.searchSeatsMovie(cdFilme).isEmpty()) {
-            return false;
-        }
-        return true;
+        return !assentoService.searchSeatsMovie(cdFilme).isEmpty();
     }
 }

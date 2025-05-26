@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -20,8 +19,8 @@ public class PessoaService {
     @Autowired
     private PessoaRepositorio pessoaRepositorio;
 
-    public Optional<PessoaModel> findById(UUID id) {
-        return pessoaRepositorio.findById(id);
+    public PessoaModel findById(UUID id) {
+        return pessoaRepositorio.findById(id).orElseThrow(() -> new RuntimeException("Pessoa não encontrado"));
     }
     public List<PessoaModel> listAll() {
         return pessoaRepositorio.findAll();
