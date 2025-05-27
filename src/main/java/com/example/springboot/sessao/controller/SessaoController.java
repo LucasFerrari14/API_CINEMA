@@ -2,6 +2,8 @@ package com.example.springboot.sessao.controller;
 
 
 
+import com.example.springboot.assento.model.AssentoModel;
+import com.example.springboot.assento.service.AssentoService;
 import com.example.springboot.sessao.DTO.SessaoDTO;
 import com.example.springboot.sessao.model.SessaoModel;
 import com.example.springboot.sessao.service.SessaoService;
@@ -20,6 +22,8 @@ import java.util.UUID;
 public class SessaoController {
     @Autowired
     SessaoService sessaoService;
+    @Autowired
+    AssentoService assentoService;
 
     @PostMapping("/sessoes")
     public ResponseEntity<SessaoModel> saveSessao(@RequestBody @Valid SessaoDTO sessaoDTO) {
@@ -36,6 +40,15 @@ public class SessaoController {
         SessaoModel sessao = sessaoService.findById(id);
 
         return ResponseEntity.status(HttpStatus.OK).body(sessao);
+    }
+
+    @GetMapping("/sessoes/{cdsessao}/assentos-livres")
+    public ResponseEntity<Object> listFreeSeats(@PathVariable(value="cdsessao") UUID id) {
+        List<AssentoModel> seats = assentoService.listFreeSeat(id);
+        if (seats.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não existem cadeiras disponíveis");
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(seats);
     }
 
     @PutMapping("/sessoes/{cdsessao}")

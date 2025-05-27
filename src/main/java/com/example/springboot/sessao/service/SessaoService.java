@@ -1,5 +1,6 @@
 package com.example.springboot.sessao.service;
 
+import com.example.springboot.assento.service.AssentoService;
 import com.example.springboot.filme.service.FilmeService;
 import com.example.springboot.sessao.DTO.SessaoDTO;
 import com.example.springboot.sessao.model.SessaoModel;
@@ -20,10 +21,12 @@ public class SessaoService {
     @Autowired
     private SessaoRepositorio sessaoRepository;
     private FilmeService filmeService;
+    private AssentoService assentoService;
 
-    public SessaoService(SessaoRepositorio sessaoRepository, FilmeService filmeService) {
+    public SessaoService(SessaoRepositorio sessaoRepository, FilmeService filmeService, AssentoService assentoService) {
         this.sessaoRepository = sessaoRepository;
         this.filmeService = filmeService;
+        this.assentoService = assentoService;
     }
 
     public SessaoModel findById(UUID id) {
@@ -42,11 +45,11 @@ public class SessaoService {
 
     public SessaoModel save(@RequestBody @Valid SessaoDTO sessaoDTO) {
         SessaoModel sessao = new SessaoModel();
-
         BeanUtils.copyProperties(sessaoDTO, sessao);
         sessao.setCdFilme(this.filmeService.findById(sessaoDTO.getCdFilme()));
         sessao.setFlAtivo(true);
         sessaoRepository.save(sessao);
+        assentoService.generateSeatsBySession(sessao.getCdSessao());
         return sessao;
     }
 
@@ -61,4 +64,5 @@ public class SessaoService {
     public List<SessaoModel> listByFilm(@NotNull UUID cdFilme) {
         return sessaoRepository.listByFilm(cdFilme);
     }
+
 }

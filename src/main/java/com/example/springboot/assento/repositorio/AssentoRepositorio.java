@@ -16,4 +16,10 @@ public interface AssentoRepositorio extends JpaRepository<AssentoModel, UUID> {
                     "JOIN CEH_SESSAO S ON A.CD_SESSAO = S.CD_SESSAO " +
                     "WHERE S.CD_FILME = :idFilme AND A.CD_PESSOA NOTNULL")
     List<AssentoModel> searchSeatsMovie(@Param("idFilme") UUID idFilme);
+
+    @Query(nativeQuery = true,
+            value = "SELECT A.* FROM CEH_ASSENTO A " +
+                    "JOIN CEH_SESSAO S ON S.CD_SESSAO = :idSessao " +
+                    "AND A.CD_PESSOA IS NULL")
+    List<AssentoModel> listFreeSeats(@Param("idSessao")UUID idSessao);
 }
