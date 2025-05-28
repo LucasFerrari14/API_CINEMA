@@ -14,6 +14,8 @@ public interface SessaoRepositorio extends JpaRepository<SessaoModel, UUID> {
 
     @Query(nativeQuery = true,
             value = "SELECT S.* FROM CEH_SESSAO S " +
-                    "JOIN CEH_FILME F ON F.CD_FILME = S.CD_FILME ")
-    List<SessaoModel> searchSessionMovie(@Param("idFilme") UUID idFilme);
+                    "WHERE S.CD_FILME = :idFilme ")
+    List<SessaoModel> listByFilm(@Param("idFilme") UUID idFilme);
+
+
 }

@@ -4,9 +4,8 @@ package com.example.springboot.assento.service;
 import com.example.springboot.assento.DTO.AssentoDTO;
 import com.example.springboot.assento.model.AssentoModel;
 import com.example.springboot.assento.repositorio.AssentoRepositorio;
-import com.example.springboot.pessoa.repositorio.PessoaRepositorio;
 import com.example.springboot.pessoa.service.PessoaService;
-import com.example.springboot.sessao.service.SessaoService;
+import com.example.springboot.sessao.repositorio.SessaoRepositorio;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.BeanUtils;
@@ -25,12 +24,12 @@ public class AssentoService {
     @Autowired
     private PessoaService pessoaService;
     @Autowired
-    private SessaoService sessaoService;
+    private SessaoRepositorio sessaoRepository;
 
-    public AssentoService(AssentoRepositorio assentoRepository, PessoaRepositorio pessoaRepository) {
+    public AssentoService(AssentoRepositorio assentoRepository, PessoaService pessoaService, SessaoRepositorio sessaoRepository) {
         this.assentoRepository = assentoRepository;
         this.pessoaService = pessoaService;
-        this.sessaoService = sessaoService;
+        this.sessaoRepository = sessaoRepository;
     }
 
     public AssentoModel findById(UUID id) {
@@ -42,10 +41,8 @@ public class AssentoService {
 
     public AssentoModel save(@RequestBody @Valid AssentoDTO assentoDTO) {
         AssentoModel assento = new AssentoModel();
-
         BeanUtils.copyProperties(assentoDTO, assento);
-        assento.setCdDono(pessoaService.findById(assentoDTO.getCdDono()));
-        assento.setCdSessao(sessaoService.findById(assentoDTO.getCdSessao()));
+        assento.setCdSessao(sessaoRepository.findById(assentoDTO.cdSessao()).orElseThrow(() -> new RuntimeException("Sessão não encontrada")));
         assentoRepository.save(assento);
         return assento;
     }
@@ -60,5 +57,27 @@ public class AssentoService {
 
     public List<AssentoModel> searchSeatsMovie(@NotNull UUID cdFilme) {
         return assentoRepository.searchSeatsMovie(cdFilme);
+    }
+
+    public void generateSeatsBySession(UUID cdSessao) {
+        String[] fileiras = {"A", "B", "C", "D", "E", "F", "G", "H", "I", "J"};
+        for (String fileira: fileiras) {
+            for (int i = 1; i < 25; i++ ) {
+                AssentoDTO assento = new AssentoDTO(i, fileira, null, cdSessao);
+                save(assento);
+            }
+        }
+    }
+
+    public List<AssentoModel> listFreeSeat(UUID cdSessao) {
+        return assentoRepository.listFreeSeats(cdSessao);
+    }
+
+    public Boolean verifySeatsFree(Integer nuSeat, String rowSeat, UUID cdSessao) {
+        return assentoRepository.findFreeByRowandNu(nuSeat, rowSeat, cdSessao).isPresent();
+    }
+
+    public Optional<AssentoModel> findByRowandNu(Integer nuSeat, String rowSeat, UUID cdSessao) {
+        return assentoRepository.findFreeByRowandNu(nuSeat, rowSeat, cdSessao);
     }
 }

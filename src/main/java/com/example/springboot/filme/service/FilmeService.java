@@ -5,6 +5,8 @@ import com.example.springboot.assento.model.AssentoModel;
 import com.example.springboot.filme.DTO.FilmeDTO;
 import com.example.springboot.filme.model.FilmeModel;
 import com.example.springboot.filme.repositorio.FilmeRepositorio;
+import com.example.springboot.sessao.repositorio.SessaoRepositorio;
+import com.example.springboot.sessao.service.SessaoService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.BeanUtils;
@@ -55,5 +57,4 @@ public class FilmeService {
     public List<FilmeModel> listFilmsToday(LocalDate data) {
         return filmeRepository.findFilmByDay(data);
     }
-
 }

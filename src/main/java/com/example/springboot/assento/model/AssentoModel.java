@@ -3,6 +3,9 @@ package com.example.springboot.assento.model;
 import com.example.springboot.pessoa.model.PessoaModel;
 import com.example.springboot.sessao.model.SessaoModel;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
