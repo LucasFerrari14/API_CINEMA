@@ -2,8 +2,10 @@ package com.example.springboot.sessao.controller;
 
 
 
+import com.example.springboot.assento.DTO.AssentoDTO;
 import com.example.springboot.assento.model.AssentoModel;
 import com.example.springboot.assento.service.AssentoService;
+import com.example.springboot.pessoa.service.PessoaService;
 import com.example.springboot.sessao.DTO.SessaoDTO;
 import com.example.springboot.sessao.model.SessaoModel;
 import com.example.springboot.sessao.service.SessaoService;
@@ -24,6 +26,8 @@ public class SessaoController {
     SessaoService sessaoService;
     @Autowired
     AssentoService assentoService;
+    @Autowired
+    PessoaService pessoaService;
 
     @PostMapping("/sessoes")
     public ResponseEntity<SessaoModel> saveSessao(@RequestBody @Valid SessaoDTO sessaoDTO) {
@@ -38,7 +42,6 @@ public class SessaoController {
     @GetMapping("/sessoes/{cdsessao}")
     public ResponseEntity<Object> getOneSessao(@PathVariable(value="cdsessao") UUID id) {
         SessaoModel sessao = sessaoService.findById(id);
-
         return ResponseEntity.status(HttpStatus.OK).body(sessao);
     }
 
@@ -49,6 +52,19 @@ public class SessaoController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Não existem cadeiras disponíveis");
         }
         return ResponseEntity.status(HttpStatus.OK).body(seats);
+    }
+
+    @PutMapping("/sessoes/{cdsessao}/comprar-ingresso")
+    public ResponseEntity<Object> buyTicekt(@PathVariable(value="cdsessao") UUID id, @RequestBody @Valid AssentoDTO assentoDTO) {
+            if (assentoService.verifySeatsFree(assentoDTO.nuAssento(),assentoDTO.deFileira(), id)) {
+                AssentoModel assento = new AssentoModel();
+                BeanUtils.copyProperties(assentoDTO, assento);
+                assento.setCdAssento(assentoService.findByRowandNu(assentoDTO.nuAssento(), assentoDTO.deFileira(), id).orElseThrow().getCdAssento());
+                assento.setCdDono(pessoaService.findById(assentoDTO.cdDono()));
+                assento.setCdSessao(sessaoService.findById(id));
+                return ResponseEntity.status(HttpStatus.OK).body(assentoService.update(assento));
+            }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("O assento desejado não está disponíveis");
     }
 
     @PutMapping("/sessoes/{cdsessao}")

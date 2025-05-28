@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -41,13 +42,12 @@ public class AssentoService {
     public AssentoModel save(@RequestBody @Valid AssentoDTO assentoDTO) {
         AssentoModel assento = new AssentoModel();
         BeanUtils.copyProperties(assentoDTO, assento);
-        assento.setCdSessao(sessaoRepository.findById(assentoDTO.getCdSessao()).orElseThrow(() -> new RuntimeException("Sessão não encontrada")));
+        assento.setCdSessao(sessaoRepository.findById(assentoDTO.cdSessao()).orElseThrow(() -> new RuntimeException("Sessão não encontrada")));
         assentoRepository.save(assento);
         return assento;
     }
 
     public AssentoModel update(@NotNull AssentoModel assento) {
-        assento.setCdDono(pessoaService.findById(assento.getCdDono().getCdPessoa()));
         return assentoRepository.save(assento);
     }
 
@@ -71,5 +71,13 @@ public class AssentoService {
 
     public List<AssentoModel> listFreeSeat(UUID cdSessao) {
         return assentoRepository.listFreeSeats(cdSessao);
+    }
+
+    public Boolean verifySeatsFree(Integer nuSeat, String rowSeat, UUID cdSessao) {
+        return assentoRepository.findFreeByRowandNu(nuSeat, rowSeat, cdSessao).isPresent();
+    }
+
+    public Optional<AssentoModel> findByRowandNu(Integer nuSeat, String rowSeat, UUID cdSessao) {
+        return assentoRepository.findFreeByRowandNu(nuSeat, rowSeat, cdSessao);
     }
 }
