@@ -34,7 +34,7 @@ public class SessaoService {
     }
 
     public void deleteSessionByFilm(UUID cdFilme) {
-        List<SessaoModel> listaSessoes = sessaoRepository.searchSessionMovie(cdFilme);
+        List<SessaoModel> listaSessoes = sessaoRepository.listByFilm(cdFilme);
         for (SessaoModel session: listaSessoes) {
             this.delete(session);
         }
@@ -56,5 +56,9 @@ public class SessaoService {
 
     public void delete(@NotNull SessaoModel sessao) {
         sessaoRepository.delete(sessao);
+    }
+
+    public List<SessaoModel> listByFilm(@NotNull UUID cdFilme) {
+        return sessaoRepository.listByFilm(cdFilme);
     }
 }
