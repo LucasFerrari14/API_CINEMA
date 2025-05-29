@@ -5,6 +5,7 @@ import com.example.springboot.assento.service.AssentoService;
 import com.example.springboot.filme.DTO.FilmeDTO;
 import com.example.springboot.filme.model.FilmeModel;
 import com.example.springboot.filme.service.FilmeService;
+import com.example.springboot.sessao.model.SessaoModel;
 import com.example.springboot.sessao.service.SessaoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
@@ -71,13 +72,20 @@ public class FilmeController {
 
     @GetMapping("/filmes/today")
     public ResponseEntity<Object> showAvaliableMoviesToday() {
-        LocalDate dtHoje = LocalDate.now();
-        List<FilmeModel> filmes = filmeService.listFilmsToday(dtHoje);
+        List<FilmeModel> filmes = filmeService.listFilmsToday(LocalDate.now());
         if (filmes.isEmpty()) {
             return ResponseEntity.status(HttpStatus.OK).body("Nenhum filme está em cartaz hoje");
         }
         return ResponseEntity.status(HttpStatus.OK).body(filmes);
+    }
 
+    @GetMapping("/filmes/{cdfilme}/session")
+    public ResponseEntity<Object> showSessionFilms(@PathVariable(value="cdfilme") UUID cdfilme) {
+        List<SessaoModel> filmes = sessaoService.listByFilm(cdfilme);
+        if (filmes.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.OK).body("O filme solicitado não tem nenhuma sessão disponível");
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(filmes);
     }
 
     public Boolean validateDate(Date dtInicio, Date dtFinal) {
